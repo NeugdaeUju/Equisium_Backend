@@ -3,6 +3,11 @@ import User from '../models/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) {
+    throw new Error('JWT_SECRET is not defined in environment variables');
+}
+
 export const signUp: RequestHandler = async (req, res) => {
     try {
         const hash = await bcrypt.hash(req.body.password, 10);
@@ -11,7 +16,7 @@ export const signUp: RequestHandler = async (req, res) => {
             password : hash,
         });
         try {
-            user.save();
+            await user.save();
             res.status(201).json({
                 message: 'User created',
             })
@@ -56,7 +61,7 @@ export const logIn: RequestHandler = async (req, res) => {
             userId: user._id,
             token: jwt.sign(
                 { userId: user._id },
-                'RAMDOM_TOKEN_SECRET',
+                jwtSecret,
                 { expiresIn: '24h'},
             ),
         });

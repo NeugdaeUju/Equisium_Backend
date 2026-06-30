@@ -1,10 +1,8 @@
 import Express from 'express';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 import cors from 'cors';
 
 import userRoutes from './routes/user';
-dotenv.config();
 
 if (!process.env.MONGODB_URL) {
     throw new Error('MONGODB_URL is not defined in environment variables')
@@ -24,8 +22,12 @@ mongoose.connect(mongoUrl)
         console.error('Failed to connect to MongoDB', error);
         process.exit(1);});
 
+if (!process.env.CORS_ORIGIN) {
+    throw new Error('CORS_ORIGIN is not defined in environment variables');
+}
+
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.CORS_ORIGIN,
     credentials: true,
 }));
 
